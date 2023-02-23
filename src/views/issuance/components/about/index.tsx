@@ -11,7 +11,7 @@ const About = () => {
     <Box sx={{ height: 'fit-content' }}>
       <Box variant="layout.borderBox" p={4}>
         <Text variant="strong" mb={2}>
-          <Trans>How does this work? </Trans>
+          <Trans>Minting explained, in short </Trans>
         </Text>
         <Text as="p" variant="legend">
           <Trans>
