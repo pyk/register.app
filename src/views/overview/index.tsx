@@ -7,9 +7,9 @@ import About from './components/About'
 import AssetOverview from './components/AssetOverview'
 import External from './components/External'
 import HistoricalData from './components/HistoricalData'
-import RecentProtocolTransactions from './components/RecentProtocolTransactions'
 import RecentRSVTransactions from './components/RecentRSVTransactions'
-import RecentTokenTransactions from './components/RecentTokenTransactions'
+import RecentTransactions from './components/RecentTransactions'
+import RevenueSplitOverview from './components/RevenueSplitOverview'
 import TokenOverview from './components/TokenOverview'
 import TokenUsage from './components/TokenUsage'
 
@@ -31,38 +31,22 @@ const Overview = () => {
 
   return (
     <Container>
-      <Grid {...gridProps} ml={[0, 0, 0, 3]} gap={0}>
-        <Box>
-          <TokenOverview
-            mt={[3, 0]}
-            ml={[3, 3, 3, 0]}
-            mr={2}
-            metrics={rTokenMetrics}
-          />
-        </Box>
-      </Grid>
+      <TokenOverview mt={[3, 0]} ml={3} metrics={rTokenMetrics} />
       <Divider {...dividerProps} />
-      <Grid {...gridProps} ml={[0, 0, 0, 3]} gap={0}>
-        <Box>
-          <TokenUsage ml={[3, 3, 3, 0]} mt={1} metrics={rTokenMetrics} />
-        </Box>
-        {rToken?.isRSV ? (
-          <RecentRSVTransactions mt={[0, 3, 3, 0]} />
-        ) : (
-          <RecentTokenTransactions mt={[0, 3, 3, 0]} />
-        )}
-      </Grid>
+      <TokenUsage ml={3} metrics={rTokenMetrics} />
       <Divider {...dividerProps} />
-      <Grid {...gridProps}>
-        <About mt={2} px={3} mr={2} />
-        <AssetOverview />
-      </Grid>
-      <Divider {...dividerProps} sx={{ display: ['none', 'block'] }} />
+      <About mt={2} px={3} />
+      <Divider mt={4} sx={{ border: 'none' }} />
       <External />
       <Divider {...dividerProps} />
       <Grid {...gridProps}>
+        <AssetOverview />
+        <RevenueSplitOverview />
+      </Grid>
+      <Divider {...dividerProps} mt={[0, 0, 0, 5]} />
+      <Grid {...gridProps}>
         <HistoricalData />
-        <RecentProtocolTransactions />
+        {rToken?.isRSV ? <RecentRSVTransactions /> : <RecentTransactions />}
       </Grid>
     </Container>
   )

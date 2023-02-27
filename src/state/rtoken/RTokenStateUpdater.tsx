@@ -1,6 +1,13 @@
 import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React } from '@web3-react/core'
-import { BasketHandlerInterface, FacadeInterface, MainInterface } from 'abis'
+import {
+  BasketHandlerInterface,
+  ERC20Interface,
+  FacadeInterface,
+  MainInterface,
+  StRSRInterface,
+} from 'abis'
+import { StRsr } from 'abis/types'
 import { ethers } from 'ethers'
 import { formatEther } from 'ethers/lib/utils'
 import useBlockNumber from 'hooks/useBlockNumber'
@@ -10,13 +17,16 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect } from 'react'
 import {
   basketNonceAtom,
+  rsrExchangeRateAtom,
   rTokenCollateralDist,
   rTokenContractsAtom,
   rTokenDistributionAtom,
   rTokenStatusAtom,
+  rTokenTotalSupplyAtom,
+  stRSRSupplyAtom,
 } from 'state/atoms'
 import { promiseMulticall } from 'state/web3/lib/multicall'
-import { truncateDecimals } from 'utils'
+import { getContract, truncateDecimals } from 'utils'
 import { FACADE_ADDRESS } from 'utils/addresses'
 import { CHAIN_ID } from 'utils/chains'
 
@@ -29,8 +39,11 @@ const RTokenStateUpdater = () => {
   const rToken = useRToken()
   const updateTokenStatus = useSetAtom(rTokenStatusAtom)
   const setDistribution = useSetAtom(rTokenDistributionAtom)
+  const setExchangeRate = useSetAtom(rsrExchangeRateAtom)
   const setCollateralDist = useSetAtom(rTokenCollateralDist)
   const setBasketNonce = useSetAtom(basketNonceAtom)
+  const setSupply = useSetAtom(rTokenTotalSupplyAtom)
+  const setStaked = useSetAtom(stRSRSupplyAtom)
   const { provider, chainId } = useWeb3React()
   const blockNumber = useBlockNumber()
   const contracts = useAtomValue(rTokenContractsAtom)
@@ -128,17 +141,55 @@ const RTokenStateUpdater = () => {
     []
   )
 
+  const getTokenMetrics = useCallback(
+    async (
+      rTokenAddress: string,
+      stRSRAddress: string,
+      provider: Web3Provider
+    ) => {
+      try {
+        const [tokenSupply, stTokenSupply, exchangeRate] =
+          await promiseMulticall(
+            [
+              {
+                abi: ERC20Interface,
+                method: 'totalSupply',
+                args: [],
+                address: rTokenAddress,
+              },
+              {
+                abi: ERC20Interface,
+                method: 'totalSupply',
+                args: [],
+                address: stRSRAddress,
+              },
+              {
+                abi: StRSRInterface,
+                method: 'exchangeRate',
+                args: [],
+                address: stRSRAddress,
+              },
+            ],
+            provider
+          )
+        setSupply(formatEther(tokenSupply))
+        setStaked(formatEther(stTokenSupply))
+        setExchangeRate(+formatEther(exchangeRate))
+      } catch (e) {
+        console.error('Error fetching exchange rate', e)
+      }
+    },
+    []
+  )
+
   useEffect(() => {
-    if (
-      rToken?.address &&
-      provider &&
-      blockNumber &&
-      rToken.main &&
-      chainId === CHAIN_ID
-    ) {
+    if (provider && blockNumber && rToken?.main && chainId === CHAIN_ID) {
       getTokenStatus(rToken.main, provider)
+      if (rToken.stToken?.address) {
+        getTokenMetrics(rToken.address, rToken.stToken.address, provider)
+      }
     }
-  }, [rToken?.address, blockNumber])
+  }, [rToken?.main, blockNumber])
 
   useEffect(() => {
     if (basketNonce) {
