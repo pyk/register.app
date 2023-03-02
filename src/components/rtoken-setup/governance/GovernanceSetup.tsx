@@ -85,7 +85,7 @@ const GovernanceSetup = ({ disabled = false, ...props }: Props) => {
       <FormField
         label={t`Guardian address`}
         placeholder={t`Input the guardian ethereum address`}
-        help={t`The Guardian has the permissions of the Pauser, the ability to invoke a LONG_FREEZE, and the ability to cancel any active proposals prior to execution.`}
+        help={t`The Guardian has the permissions of the Pauser, the ability to invoke a LONG_FREEZE, and the ability to cancel any queued proposals prior to execution.`}
         mb={3}
         name="guardian"
         options={{
