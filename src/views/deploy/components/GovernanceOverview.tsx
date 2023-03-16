@@ -84,7 +84,7 @@ const GovernanceStatus = () => {
       </Text>
       <Button
         onClick={deploy}
-        variant="primary"
+        variant="accentAction"
         disabled={!isValid || !fee}
         mt={4}
         sx={{ width: '100%' }}
@@ -129,15 +129,6 @@ const GovernanceOverview = (props: BoxProps) => (
       <Text as="p" variant="legend">
         You can leave your RToken paused and come back to setting up governance
         later.
-      </Text>
-    </Box>
-    <Divider my={4} mx={-4} />
-    <Box>
-      <Text variant="strong" mb={2}>
-        What happens after deploy?
-      </Text>
-      <Text as="p" variant="legend">
-        Add link here
       </Text>
     </Box>
   </Container>
