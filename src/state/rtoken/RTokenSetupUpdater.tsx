@@ -5,6 +5,7 @@ import {
   AssetRegistryInterface,
   BackingManagerInterface,
   BrokerInterface,
+  CollateralInterface,
   Distributor as DistributorAbi,
   MainInterface,
   RevenueTraderInterface,
@@ -15,16 +16,18 @@ import { Asset } from 'abis/types'
 import { RevenueSplit } from 'components/rtoken-setup/atoms'
 import { formatEther } from 'ethers/lib/utils'
 import useRToken from 'hooks/useRToken'
-import { useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect } from 'react'
 import {
+  rTokenCollateralAssetsAtom,
   rTokenContractsAtom,
   rTokenParamsAtom,
   rTokenRevenueSplitAtom,
 } from 'state/atoms'
 import { promiseMulticall } from 'state/web3/lib/multicall'
-import { StringMap } from 'types'
+import { ContractCall, StringMap } from 'types'
 import { getContract } from 'utils'
+import { FURNACE_ADDRESS, ST_RSR_ADDRESS } from 'utils/addresses'
 
 const shareToPercent = (shares: number): string => {
   return Math.floor((shares * 100) / 10000).toString()
@@ -40,7 +43,8 @@ const RTokenSetupUpdater = () => {
   const { provider } = useWeb3React()
   const setRevenueSplit = useSetAtom(rTokenRevenueSplitAtom)
   const setRTokenParams = useSetAtom(rTokenParamsAtom)
-  const setRTokenContracts = useSetAtom(rTokenContractsAtom)
+  const setCollateralAssets = useSetAtom(rTokenCollateralAssetsAtom)
+  const [contracts, setRTokenContracts] = useAtom(rTokenContractsAtom)
 
   const fetchParams = useCallback(
     async (
@@ -118,8 +122,6 @@ const RTokenSetupUpdater = () => {
           'DistributionSet(address,uint16,uint16)'
         )
         const dist: StringMap = { external: {}, holders: '', stakers: '' }
-        const furnace = '0x0000000000000000000000000000000000000001'
-        const stRSR = '0x0000000000000000000000000000000000000002'
 
         for (const event of events) {
           if (event.args) {
@@ -128,18 +130,18 @@ const RTokenSetupUpdater = () => {
             // Dist removed
             if (!rTokenDist && !rsrDist) {
               delete dist[dest]
-            } else if (dest === furnace) {
-              dist.holders = shareToPercent(rTokenDist)
-            } else if (dest === stRSR) {
-              dist.stakers = shareToPercent(rsrDist)
+            } else if (dest === FURNACE_ADDRESS) {
+              dist.holders = shareToPercent(rTokenDist) || '0'
+            } else if (dest === ST_RSR_ADDRESS) {
+              dist.stakers = shareToPercent(rsrDist) || '0'
             } else {
               const holders = shareToPercent(rTokenDist)
               const stakers = shareToPercent(rsrDist)
               const total = +holders + +stakers
 
               dist.external[dest] = {
-                holders: ((+holders * 100) / total).toString(),
-                stakers: ((+stakers * 100) / total).toString(),
+                holders: ((+holders * 100) / total).toString() || '0',
+                stakers: ((+stakers * 100) / total).toString() || '0',
                 total: total.toString(),
                 address: dest,
               }
@@ -287,11 +289,56 @@ const RTokenSetupUpdater = () => {
     []
   )
 
+  // TODO: move to the same multicall where the collaterals are fetched
+  const fetchBasketAssets = async () => {
+    if (rToken && provider && contracts.assetRegistry && !rToken.isRSV) {
+      try {
+        const assets = await promiseMulticall(
+          rToken.collaterals.map((c) => ({
+            address: contracts.assetRegistry,
+            abi: AssetRegistryInterface,
+            method: 'toAsset',
+            args: [c.address],
+          })),
+          provider
+        )
+
+        setCollateralAssets(assets)
+
+        // TODO: Optimize code using reduce function, prioritize clarity atm
+        const calls: ContractCall[] = []
+
+        for (const asset of assets) {
+          calls.push({
+            address: asset,
+            abi: CollateralInterface,
+            method: 'delayUntilDefault',
+            args: [],
+          })
+          calls.push({
+            address: asset,
+            abi: CollateralInterface,
+            method: 'delayUntilDefault',
+            args: [],
+          })
+        }
+
+        // const assetInfo = await promiseMulticall(assets.map(address => ) )
+      } catch (e) {
+        console.error('Error fetching basket assets', e)
+      }
+    }
+  }
+
   useEffect(() => {
     if (rToken?.main && provider) {
       fetchParams(rToken.address, rToken.main, provider)
     }
   }, [rToken?.main, provider])
+
+  useEffect(() => {
+    fetchBasketAssets()
+  }, [contracts?.assetRegistry, provider])
 
   return null
 }

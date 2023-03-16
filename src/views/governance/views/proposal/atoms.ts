@@ -11,7 +11,7 @@ import { Interface } from 'ethers/lib/utils'
 import { atom } from 'jotai'
 import { atomWithReset } from 'jotai/utils'
 import { rTokenAtom, rTokenContractsAtom } from 'state/atoms'
-import { BackupChanges } from './hooks/useBackupChanges'
+import { BackupChanges, CollateralChange } from './hooks/useBackupChanges'
 import { ParameterChange } from './hooks/useParametersChanges'
 import { RevenueSplitChanges } from './hooks/useRevenueSplitChanges'
 import { RoleChange } from './hooks/useRoleChanges'
@@ -26,6 +26,7 @@ export const proposedRolesAtom = atomWithReset({
   pausers: [] as string[],
   freezers: [] as string[],
   longFreezers: [] as string[],
+  guardians: [] as string[],
 })
 
 export const revenueSplitChangesAtom = atomWithReset<RevenueSplitChanges>({
@@ -44,6 +45,8 @@ export const backupChangesAtom = atomWithReset<BackupChanges>({
   diversityFactor: [],
   count: 0,
 })
+
+export const basketChangesAtom = atomWithReset<CollateralChange[]>([])
 
 export const isProposalValidAtom = atom(false)
 export const isProposalEditingAtom = atom(true)

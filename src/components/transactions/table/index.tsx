@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { t, Trans } from '@lingui/macro'
+import GoTo from 'components/button/GoTo'
 import Help from 'components/help'
 import { Table } from 'components/table'
 import { useAtomValue } from 'jotai'
@@ -44,7 +45,7 @@ const TransactionsTable = ({
       MINT: t`Mint`,
       REDEEM: t`Redeem`,
       TRANSFER: t`Transfer`,
-      BURN: t`Burn`,
+      BURN: t`Redeem`,
       ISSUE: t`Issue`,
       ISSUE_START: t`Start Issue`,
       CLAIM: t`Claim`,
@@ -101,9 +102,13 @@ const TransactionsTable = ({
               >
                 {shortenString(cell.value)}
               </Link>
+              <GoTo
+                href={getExplorerLink(cell.value, ExplorerDataType.TRANSACTION)}
+                sx={{ display: ['block', 'none'] }}
+              />
             </>
           ) : (
-            'RPay'
+            'Rpay'
           ),
       },
     ],

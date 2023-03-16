@@ -62,15 +62,15 @@ export const relativeTime = (from: number, to: number) => {
   if (delta >= timeUnits.year) {
     return t`A year ago`
   } else if (delta >= timeUnits.month) {
-    return `>${Math.floor(delta / timeUnits.month)}` + t`mth`
+    return `${Math.floor(delta / timeUnits.month)}` + t`mth`
   } else if (delta >= timeUnits.day) {
-    return `>${Math.floor(delta / timeUnits.day)}d`
+    return `${Math.floor(delta / timeUnits.day)}d`
   } else if (delta >= timeUnits.hour) {
-    return `>${Math.floor(delta / timeUnits.hour)}h`
+    return `${Math.floor(delta / timeUnits.hour)}h`
   } else if (delta >= timeUnits.minute) {
-    return `>${Math.floor(delta / timeUnits.minute)}m`
+    return `${Math.floor(delta / timeUnits.minute)}m`
   } else {
-    return `>${delta}s`
+    return `${delta}s`
   }
 }
 
@@ -267,6 +267,6 @@ export const getProposalTitle = (description: string) => {
   return description.split(/\r?\n/)[0].replaceAll('#', '').trim()
 }
 
-export const parseDuration = (duration: number) => {
-  return humanizeDuration(duration * 1000)
+export const parseDuration = (duration: number, options?: any) => {
+  return humanizeDuration(duration * 1000, options)
 }

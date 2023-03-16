@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro'
 import CopyValue from 'components/button/CopyValue'
 import GoTo from 'components/button/GoTo'
 import GovernanceActionIcon from 'components/icons/GovernanceActionIcon'
+import useRToken from 'hooks/useRToken'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, BoxProps, Button, Divider, Flex, Spinner, Text } from 'theme-ui'
@@ -17,12 +18,13 @@ const Container = styled(Box)`
 
 const GovernanceStatus = () => {
   const navigate = useNavigate()
+  const rToken = useRToken()
   const { fee, deploy, isValid } = useGovernance()
   const tx = useGovernanceTxState()
 
   useEffect(() => {
-    if (tx?.status === TRANSACTION_STATUS.CONFIRMED) {
-      navigate(ROUTES.SETTINGS)
+    if (tx?.status === TRANSACTION_STATUS.CONFIRMED && rToken) {
+      navigate(`${ROUTES.SETTINGS}?token=${rToken.address}`)
     }
   }, [tx?.status])
 

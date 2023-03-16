@@ -52,7 +52,6 @@ const useTokens = () => {
           name: rtoken.token.name,
           symbol: rtoken.token.symbol,
           price: rtoken.token.lastPriceUSD,
-          holders: rtoken.token.holderCount,
           transactionCount: rtoken.token.transferCount,
           cumulativeVolume:
             +formatEther(rtoken.token.cumulativeVolume) *
@@ -75,8 +74,8 @@ const UnlistedTokensTable = () => {
   const columns = useMemo(
     () => [
       {
-        Header: t`Name`,
-        accessor: 'name',
+        Header: t`Token`,
+        accessor: 'symbol',
         Cell: (data: any) => {
           return (
             <Box sx={{ minWidth: 150 }}>
@@ -94,10 +93,6 @@ const UnlistedTokensTable = () => {
         Header: t`Mkt Cap`,
         accessor: 'marketCap',
         Cell: formatUsdCurrencyCell,
-      },
-      {
-        Header: t`Holders`,
-        accessor: 'holders',
       },
       {
         Header: t`Txs`,

@@ -17,7 +17,7 @@ import {
   TransactionMap,
   TransactionState,
 } from 'types'
-import { RSR, TRANSACTION_STATUS } from 'utils/constants'
+import { COLLATERAL_STATUS, RSR, TRANSACTION_STATUS } from 'utils/constants'
 import { WalletTransaction } from './../types/index'
 import {
   BackupBasket,
@@ -53,6 +53,20 @@ export const reserveTokensAtom = atomWithStorage<{
 
 // Current selected rToken address
 export const selectedRTokenAtom = atom('')
+
+// TODO: Temporal measure - track collateral status
+export const rTokenCollateralAssetsAtom = atom<string[]>([])
+export const rTokenCollateralStatusAtom = atom<{ [x: string]: 0 | 1 | 2 }>({})
+
+export const rTokenBasketStatusAtom = atom((get) => {
+  const status = get(rTokenCollateralStatusAtom)
+
+  if (!Object.keys(status).length) {
+    return 0
+  }
+
+  return Math.max(...Object.values(status))
+})
 
 // RToken related contracts
 export const rTokenContractsAtom = atomWithReset<StringMap>({
@@ -94,6 +108,7 @@ export const rTokenGovernanceAtom = atomWithReset<{
   timelock?: string
   votingDelay?: string
   votingPeriod?: string
+  executionDelay?: string
   proposalThreshold?: string
   quorumDenominator?: string
   quorumNumerator?: string
@@ -156,6 +171,8 @@ export const rTokenManagersAtom = atom({
   longFreezers: [] as string[],
 })
 
+export const rTokenGuardiansAtom = atom([] as string[])
+
 /**
  * ##############################
  * ? Wallet/Account related atoms
@@ -171,11 +188,6 @@ export const accountRoleAtom = atom({
   pauser: false,
   shortFreezer: false,
   longFreezer: false,
-})
-export const isManagerAtom = atom<boolean>((get) => {
-  const role = get(accountRoleAtom)
-
-  return role.owner || role.pauser || role.shortFreezer || role.longFreezer
 })
 
 /**

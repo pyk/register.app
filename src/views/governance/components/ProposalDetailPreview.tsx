@@ -69,7 +69,8 @@ const ProposalDetail = ({ addresses, calldatas, ...props }: Props) => {
   const interfaceMap = useAtomValue(interfaceMapAtom)
   const [parse] = parseCallDatas(addresses, calldatas, interfaceMap)
 
-  console.log('parse?', interfaceMap)
+  console.log('interfaceMap', interfaceMap)
+  console.log('changes', addresses)
 
   return (
     <Box>

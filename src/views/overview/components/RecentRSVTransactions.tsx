@@ -60,8 +60,8 @@ const RecentRSVTransactions = (props: BoxProps) => {
       <TransactionsTable
         compact
         bordered
-        maxHeight={400}
-        help="This includes on-chain transactions in addition to anonymized RPay transactions to show the full story of the RSV ecosystem."
+        maxHeight={520}
+        help="This includes on-chain transactions in addition to anonymized Rpay transactions to show the full story of the RSV ecosystem."
         title={t`User Transactions`}
         data={txs}
         {...props}

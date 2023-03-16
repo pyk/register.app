@@ -1,18 +1,27 @@
 import { t, Trans } from '@lingui/macro'
+import { useWeb3React } from '@web3-react/core'
+import { GovernanceInterface } from 'abis'
 import { SmallButton } from 'components/button'
 import IconInfo from 'components/info-icon'
-import GovernanceFormatIcon from 'components/icons/GovernanceFormatIcon'
 import { formatEther } from 'ethers/lib/utils'
 import { gql } from 'graphql-request'
+import useBlockNumber from 'hooks/useBlockNumber'
+import { useContractCall } from 'hooks/useCall'
 import useQuery from 'hooks/useQuery'
 import useRToken from 'hooks/useRToken'
 import { useAtomValue } from 'jotai'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { rTokenGovernanceAtom } from 'state/atoms'
-import { Box, Divider, Grid, Image, Text } from 'theme-ui'
+import {
+  rTokenGovernanceAtom,
+  rTokenGuardiansAtom,
+  stRsrBalanceAtom,
+} from 'state/atoms'
+import { Box, Grid, Image, Text } from 'theme-ui'
 import { formatCurrency } from 'utils'
 import { ROUTES } from 'utils/constants'
+import RolesView from 'views/settings/components/RolesView'
+import SettingItem from 'views/settings/components/SettingItem'
 import AccountVotes from './AccountVotes'
 
 const query = gql`
@@ -52,9 +61,23 @@ const useStats = () => {
 // TODO: Validate if account is above proposal threshold
 const GovernanceOverview = () => {
   const stats = useStats()
+  const { account } = useWeb3React()
   const navigate = useNavigate()
   const rToken = useRToken()
+  const blockNumber = useBlockNumber()
   const governance = useAtomValue(rTokenGovernanceAtom)
+  const guardians = useAtomValue(rTokenGuardiansAtom)
+  const { value = [] } =
+    useContractCall(
+      account &&
+        governance.governor &&
+        !!blockNumber && {
+          abi: GovernanceInterface,
+          address: governance.governor,
+          method: 'getVotes',
+          args: [account, blockNumber - 1],
+        }
+    ) ?? {}
 
   return (
     <Box>
@@ -98,14 +121,31 @@ const GovernanceOverview = () => {
               text={formatCurrency(stats.totalDelegates)}
             />
           </Box>
+          <Box p={4} sx={{ borderBottom: '1px solid', borderColor: 'border' }}>
+            <Text variant="subtitle" mb={3}>
+              <Trans>Voting power</Trans>
+            </Text>
+            <IconInfo
+              icon={<Image src="/svgs/vote-supply.svg" />}
+              title={t`Current`}
+              text={formatCurrency(value[0] ? +formatEther(value[0]) : 0)}
+            />
+          </Box>
         </Grid>
       </Box>
-      <Box mt={4} variant="layout.borderBox">
+      <Box mt={4} mb={4} variant="layout.borderBox">
         <Text variant="subtitle">
           <Trans>Governance format</Trans>
         </Text>
         <Text variant="title">{governance ? governance.name : 'Custom'}</Text>
-
+        {governance && (
+          <SettingItem
+            my={3}
+            title={t`Guardian`}
+            subtitle={t`Role held by:`}
+            value={<RolesView roles={guardians} />}
+          />
+        )}
         <SmallButton
           mt={3}
           variant="muted"
@@ -113,7 +153,7 @@ const GovernanceOverview = () => {
             navigate(`${ROUTES.SETTINGS}?token=${rToken?.address}`)
           }
         >
-          <Trans>Settings & Roles</Trans>
+          <Trans>Settings</Trans>
         </SmallButton>
         <SmallButton
           mt={3}
