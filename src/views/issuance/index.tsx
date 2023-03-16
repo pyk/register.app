@@ -9,10 +9,10 @@ import Redeem from './components/redeem'
  * Mint & Redeem view
  */
 const Issuance = () => (
-  <Container pb={4}>
+  <Container py={3}>
     <Grid columns={[1, 1, 1, '2fr 1.5fr']} gap={[3, 5]}>
       <Box>
-        <Grid columns={[1, 2]} gap={[1, 4]} mb={[1, 4]}>
+        <Grid columns={[1, 2]} gap={[3, 4]} mb={[3, 4]}>
           <Issue />
           <Redeem />
         </Grid>

@@ -68,7 +68,7 @@ const ProposalList = () => {
           </SmallButton>
         </Box>
 
-        <Box px={4} mt={3}>
+        <Box px={2} mt={3}>
           {!data.length && (
             <Box py={4} mt={4} sx={{ textAlign: 'center' }}>
               <EmptyBoxIcon />

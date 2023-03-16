@@ -42,7 +42,7 @@ const Home = () => {
       {!account && !visited && <Greet onDismiss={handleDismiss} />}
       {!!account && <Portfolio />}
       <Grid columns={[1, 1, 1, 2]}>
-        <TokenStats mb={[5, 5, 5, 0]} mt={[0, 3]} />
+        <TokenStats mb={[5, 5, 5, 0]} mt={3} />
         <TransactionsOverview />
       </Grid>
       <Divider mb={[0, 2]} {...dividerProps} />

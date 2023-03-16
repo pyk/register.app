@@ -44,7 +44,7 @@ const RevenueSplitOverview = (props: BoxProps) => {
   }
 
   return (
-    <Box px={4} py={4} {...props}>
+    <Box px={4} py={[2, 4]} {...props}>
       <RevenueSplitIcon />
       <ContentHead
         mb={4}
