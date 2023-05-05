@@ -1,6 +1,7 @@
 import Analytics from 'components/analytics/Analytics'
 import ToastContainer from 'components/toaster-container/ToastContainer'
-import { HashRouter as Router, Route, Routes } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
+import { Route, HashRouter as Router, Routes } from 'react-router-dom'
 import Updater from 'state/updater'
 import Web3Provider from 'state/web3'
 import { ThemeProvider } from 'theme-ui'
@@ -12,6 +13,7 @@ import Governance from 'views/governance'
 import GovernanceProposal from 'views/governance/views/proposal'
 import GovernanceProposalDetail from 'views/governance/views/proposal-detail'
 import Home from 'views/home'
+import IssuanceFallback from 'views/issuance/IssuanceFallback'
 import Overview from 'views/overview'
 import Management from 'views/settings'
 import Staking from 'views/staking'
@@ -19,12 +21,7 @@ import Tokens from 'views/tokens/Tokens'
 import Layout from './components/layout'
 import LanguageProvider from './i18n'
 import { theme } from './theme'
-import { ErrorBoundary } from 'react-error-boundary'
-// import Issuance from './views/issuance'
-import React, { Suspense } from 'react'
-import IssuanceFallback from 'views/issuance/IssuanceFallback'
-
-const Issuance = React.lazy(() => import('./views/issuance'))
+import Issuance from './views/issuance'
 
 /**
  * App Entry point - Handles views routing
@@ -47,9 +44,7 @@ const App = () => (
                 path={ROUTES.ISSUANCE}
                 element={
                   <ErrorBoundary fallback={<IssuanceFallback />}>
-                    <Suspense>
-                      <Issuance />
-                    </Suspense>
+                    <Issuance />
                   </ErrorBoundary>
                 }
               />
