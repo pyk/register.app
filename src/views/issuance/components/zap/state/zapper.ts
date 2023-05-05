@@ -32,7 +32,7 @@ export const zapperState = loadable(
     if (provider == null) {
       return null
     }
-    
+
     const universe = await Universe.createWithConfig(
       provider,
       {

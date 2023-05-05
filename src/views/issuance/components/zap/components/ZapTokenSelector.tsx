@@ -8,7 +8,7 @@ import { transition } from 'theme'
 import { Box, Flex } from 'theme-ui'
 import { ui } from '../state/ui-atoms'
 
-export const ActionItem = styled(Flex)`
+const ActionItem = styled(Flex)`
   transition: ${transition};
   padding: 16px;
   border-bottom: 1px solid var(--theme-ui-colors-border);
