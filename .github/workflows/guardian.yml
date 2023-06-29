@@ -13,7 +13,7 @@ jobs:
       - name: Setup node
         run: |
           curl -sL https://deb.nodesource.com/setup_18.x | bash -
-          apt-get install -y nodejs
+          sudo apt install -y nodejs
           corepack enable
       - name: Install dependencies
         run: yarn install
