@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup node
-        run: |
-          curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
-          sudo apt install -y nodejs
-          corepack enable
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
       - name: Install dependencies
         run: yarn install
       - name: Install Foundry
